@@ -1,0 +1,552 @@
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.Types;
+import java.util.Scanner;
+import java.io.*;
+import java.sql.SQLException;
+import java.sql.DriverManager;
+
+public class Project_Java_Bhoumick_Pritesh 
+{ 
+	public static void main(String[] args) throws SQLException 
+	{ 
+		// Connect to database 
+		final String hostName = "bhou2019-sql-server.database.windows.net"; 
+		final String dbName = "cs-dsa-4513-sql-db"; 
+		final String user = "bhou2019"; 
+		final String password = "Pupul*90"; 
+		final String url = String.format("jdbc:sqlserver://%s:1433;database=%s;user=%s;"
+				+ "password=%s;encrypt=true;hostNameInCertificate=*.database.windows.net;"
+				+ "loginTimeout=30;", hostName, dbName, user, password); 
+
+		try (final Connection connection = DriverManager.getConnection(url)) 
+		{ 
+			System.out.println("Connection established\n");
+			Scanner scanner = new Scanner(System.in); //open a scanner object to take in user input
+			int input = 0; //Variables to store user choice
+			//Display input choices to be made
+			System.out.println("WELCOME TO THE DATABASE SYSTEM OF FUTURE, INC.\n");
+			System.out.println("Choices:");
+			System.out.println("1. Enter a new employee");
+			System.out.println("2. Enter a new product associated with the person who made the product, "
+					+ "repaired the product if it is repaired, or checked the product");
+			System.out.println("3. Enter a customer associated with some products");
+			System.out.println("4. Create a new account associated with a product");
+			System.out.println("5. Enter a complaint associated with a customer and product");
+			System.out.println("6. Enter an accident associated with appropriate employee and product");
+			System.out.println("7. Retrieve the date produced and time spent to produce a particular product");
+			System.out.println("8. Retrieve all products made by a particular worker");
+			System.out.println("9. Retrieve the total number of errors a particular quality controller made. "
+					+ "This is the total number of products certified by this controller and got some complaints");
+			System.out.println("10. Retrieve the total costs of the products in the product3 category which "
+					+ "were repaired at the request of a particular quality controller");
+			System.out.println("11. Retrieve all customers who purchased all products of a particular color");
+			System.out.println("12. Retrieve the total number of work days lost due to accidents in repairing "
+					+ "the products which got complaints");
+			System.out.println("13. Retrieve all customers who are also workers");
+			System.out.println("14. Retrieve all the customers who have purchased the products made or "
+					+ "certified or repaired by themselves");
+			System.out.println("15. Retrieve the average cost of all products made in a particular year");
+			System.out.println("16. Switch the position between a technical staff and a quality controller");
+			System.out.println("17. Delete all accidents whose dates are in some range");
+			System.out.println("18. Import: enter new customers from a data file until the file is empty");
+			System.out.println("19. Export: Retrieve all customers (in same order) and output them to a data "
+					+ "file instead of screen");
+			System.out.println("20. Quit");
+
+			while (input != 20) //ask user for an input until user decides to quit
+			{
+				System.out.print("\n\nEnter choice: "); //Take choice from user
+				input = scanner.nextInt(); //User Input 
+				switch(input) //as per user input choice
+				{
+				case 1: //Query 1
+				{
+					int type = 0;
+					String EName, Address;
+					System.out.print("Enter Employee Name: ");
+					EName = scanner.next(); //Employee Name
+					System.out.print("Enter Address: ");
+					Address = scanner.next(); //Address
+					System.out.print("Enter Employee Type (1-Tech_Staff; 2-Qual_Cont; 3-Worker): ");
+					type = scanner.nextInt(); //Employee type
+					switch(type)
+					{
+					case 1: //Technical Staff
+					{
+						String Education, Position;
+						System.out.print("Enter Education: ");
+						Education = scanner.next(); //Technical staff education
+						System.out.print("Enter Position: ");
+						Position = scanner.next(); //Technical staff position
+						CallableStatement Q1_T = connection.prepareCall("{call Q1_T(?,?,?,?)}");
+						Q1_T.setString(1, EName);
+						Q1_T.setString(2, Address);
+						Q1_T.setString(3, Education);
+						Q1_T.setString(4, Position);
+						Q1_T.executeUpdate();
+						break;
+					}
+					case 2: //Quality Controller
+					{
+						String P_Type;
+						System.out.print("Enter Product Type (P1, P2, P3): ");
+						P_Type = scanner.next(); //Product type
+						CallableStatement Q1_Q = connection.prepareCall("{call Q1_Q(?,?,?)}");
+						Q1_Q.setString(1, EName);
+						Q1_Q.setString(2, Address);
+						Q1_Q.setString(3, P_Type);
+						Q1_Q.executeUpdate();
+						break;
+					}
+					case 3: //Worker
+					{
+						int Max = 0;
+						System.out.print("Enter Max no. of products: ");
+						Max = scanner.nextInt(); //Max no of products
+						CallableStatement Q1_W = connection.prepareCall("{call Q1_W(?,?,?)}");
+						Q1_W.setString(1, EName);
+						Q1_W.setString(2, Address);
+						Q1_W.setInt(3, Max);
+						Q1_W.executeUpdate();
+						break;
+					}
+					default:
+					{
+						System.out.print("Enter valid input\n");
+					}
+					}
+					System.out.print("New employee added to database");
+					break;
+				}
+				case 2: //Query 2
+				{
+					int type = 0, cert = 0;
+					int PID = 0, Time_Spent = 0;
+					String Date, WName, QName, TName, size;
+					System.out.print("Enter Product ID: ");
+					PID = scanner.nextInt(); //Product ID
+					System.out.print("Enter Date (YYYY-MM-DD): ");
+					Date = scanner.next(); //Date
+					System.out.print("Enter Time Spent: ");
+					Time_Spent = scanner.nextInt(); //Time Spent
+					System.out.print("Enter Worker Name: ");
+					WName = scanner.next(); //Worker Name
+					System.out.print("Enter Quality Controller Name: ");
+					QName = scanner.next(); //Quality Controller Name
+					System.out.print("Enter Technical Staff Name: ");
+					TName = scanner.next(); //Technical Staff Name
+					System.out.print("Enter Product Type (1-Product1; 2-Product2; 3-Product3): ");
+					type = scanner.nextInt(); //Product type
+					switch(type)
+					{
+					case 1: //Product1
+					{
+						String Software;
+						String Date1 = "2017-01-01";
+						System.out.print("Enter Size (small, medium, large): ");
+						size = scanner.next(); //size
+						System.out.print("Enter Software name: ");
+						Software = scanner.next(); //Software name
+						System.out.print("Was the product certified by Qual Cont (1-Yes, 0-No): ");
+						cert = scanner.nextInt();
+						CallableStatement Q2_P1 = connection.prepareCall("{call Q2_P1(?,?,?,?,?,?,?,?,?,?)}");
+						Q2_P1.setInt(1, PID);
+						Q2_P1.setString(2, Date);
+						Q2_P1.setInt(3, Time_Spent);
+						Q2_P1.setString(4, WName);
+						Q2_P1.setString(5, QName);
+						Q2_P1.setString(6, TName);
+						Q2_P1.setString(7, size);
+						Q2_P1.setString(8, Software);
+						Q2_P1.setInt(9, cert);
+						if (cert == 0) { //If product is not certified by Qual Cont
+							System.out.print("Date for repair request by Qual Cont (YYYY-MM-DD): ");
+							Date1 = scanner.next(); //Repair request date by Qual Cont
+						}
+						Q2_P1.setString(10, Date1);
+						Q2_P1.executeUpdate();
+						break;
+					}
+					case 2: //Product2
+					{
+						String Color;
+						String Date1 = "2017-01-01";
+						System.out.print("Enter Size (small, medium, large): ");
+						size = scanner.next(); //size
+						System.out.print("Enter Color: ");
+						Color = scanner.next(); //Color
+						System.out.print("Was the product certified by Qual Cont (1-Yes, 0-No): ");
+						cert = scanner.nextInt();
+						CallableStatement Q2_P2 = connection.prepareCall("{call Q2_P2(?,?,?,?,?,?,?,?,?,?)}");
+						Q2_P2.setInt(1, PID);
+						Q2_P2.setString(2, Date);
+						Q2_P2.setInt(3, Time_Spent);
+						Q2_P2.setString(4, WName);
+						Q2_P2.setString(5, QName);
+						Q2_P2.setString(6, TName);
+						Q2_P2.setString(7, size);
+						Q2_P2.setString(8, Color);
+						Q2_P2.setInt(9, cert);
+						if (cert == 0) { //If product is not certified by Qual Cont
+							System.out.print("Date for repair request by Qual Cont (YYYY-MM-DD): ");
+							Date1 = scanner.next(); //Repair request date by Qual Cont
+						}
+						Q2_P2.setString(10, Date1);
+						Q2_P2.executeUpdate();
+						break;
+					}
+					case 3: //Product3
+					{
+						int weight = 0;
+						String Date1 = "2017-01-01";
+						System.out.print("Enter Size (small, medium, large): ");
+						size = scanner.next(); //size
+						System.out.print("Enter Weight: ");
+						weight = scanner.nextInt(); //Weight
+						System.out.print("Was the product certified by Qual Cont (1-Yes, 0-No): ");
+						cert = scanner.nextInt();
+						CallableStatement Q2_P3 = connection.prepareCall("{call Q2_P3(?,?,?,?,?,?,?,?,?,?)}");
+						Q2_P3.setInt(1, PID);
+						Q2_P3.setString(2, Date);
+						Q2_P3.setInt(3, Time_Spent);
+						Q2_P3.setString(4, WName);
+						Q2_P3.setString(5, QName);
+						Q2_P3.setString(6, TName);
+						Q2_P3.setString(7, size);
+						Q2_P3.setInt(8, weight);
+						Q2_P3.setInt(9, cert);
+						if (cert == 0) { //If product is not certified by Qual Cont
+							System.out.print("Date for repair request by Qual Cont (YYYY-MM-DD): ");
+							Date1 = scanner.next(); //Repair request date by Qual Cont
+						}
+						Q2_P3.setString(10, Date1);
+						Q2_P3.executeUpdate();
+						break;
+					}
+					default:
+					{
+						System.out.print("Enter valid input\n");
+					}
+					}
+					System.out.print("New product added to database");
+					break;
+				}
+				case 3: //Query 3
+				{
+					int PID = 0;
+					String CName, Address;
+					System.out.print("Enter Customer Name: ");
+					CName = scanner.next(); //Customer name
+					System.out.print("Enter Address: ");
+					Address = scanner.next(); //Address
+					System.out.print("Enter Product ID: ");
+					PID = scanner.nextInt(); //Product ID
+					CallableStatement Q3 = connection.prepareCall("{call Q3(?,?,?)}");
+					Q3.setString(1, CName);
+					Q3.setString(2, Address);
+					Q3.setInt(3, PID);
+					Q3.executeUpdate();
+					System.out.print("New customer added to database");
+					break;
+				}
+				case 4: //Query 4
+				{
+					int Ac = 0, PID = 0;
+					String Date, A_Type;
+					float Cost = 0;
+					System.out.print("Enter Account No.:");
+					Ac = scanner.nextInt(); //Account No
+					System.out.print("Enter Date (YYYY-MM-DD): " );
+					Date = scanner.next(); //Date
+					System.out.print("Enter Cost: ");
+					Cost = scanner.nextFloat(); //Cost
+					System.out.print("Enter Product type (P1, P2, P3): ");
+					A_Type = scanner.next(); //Account type
+					System.out.print("Enter Product ID: ");
+					PID = scanner.nextInt(); //Product ID
+					CallableStatement Q4 = connection.prepareCall("{call Q4(?,?,?,?,?)}");
+					Q4.setInt(1, Ac);
+					Q4.setString(2, Date);
+					Q4.setFloat(3, Cost);
+					Q4.setString(4, A_Type);
+					Q4.setInt(5, PID);
+					Q4.executeUpdate();
+					System.out.print("New account created for Product type, " + A_Type + " with Product ID: " + PID);
+					break;
+				}
+				case 5: //Query 5
+				{
+					int PID = 0;
+					String CName, TName, Date_R;
+					System.out.print("Enter Customer name: ");
+					CName = scanner.next(); // Customer name
+					System.out.print("Enter Product ID: ");
+					PID = scanner.nextInt(); //Product ID
+					String Date, Detail, Treatment;
+					int CID = 0;
+					System.out.print("Enter Complaint ID: ");
+					CID = scanner.nextInt(); //Complaint ID
+					System.out.print("Enter Complaint Date: ");
+					Date = scanner.next(); //Date
+					System.out.print("Enter Complaint detail: ");
+					Detail = scanner.next(); //Details
+					System.out.print("Enter treatment expected: ");
+					Treatment = scanner.next(); //Treatment
+					System.out.print("Enter Tech Staff assigned for repair: ");
+					TName = scanner.next(); //Tech staff name assigned for repair
+					System.out.print("Enter repair date: ");
+					Date_R = scanner.next(); //Repair date
+					CallableStatement Q5 = connection.prepareCall("{call Q5(?,?,?,?,?,?,?,?)}");
+					Q5.setInt(1, CID);
+					Q5.setString(2, Date);
+					Q5.setString(3, Detail);
+					Q5.setString(4, Treatment);
+					Q5.setInt(5, PID);
+					Q5.setString(6, CName);
+					Q5.setString(7, TName);
+					Q5.setString(8, Date_R);
+					Q5.executeUpdate();
+					System.out.print("Complaint added to database");
+					break;
+				}
+				case 6: //Query 6
+				{
+					int Ac = 0, Days_Lost = 0, PID = 0;
+					String Date, EName;
+					System.out.print("Enter Accident No.: ");
+					Ac = scanner.nextInt(); //Accident No.
+					System.out.print("Enter Accident date (YYYY-MM-DD): ");
+					Date = scanner.next(); //Accident date
+					System.out.print("Enter days lost: ");
+					Days_Lost = scanner.nextInt(); //Days lost
+					System.out.print("Enter Employee name: ");
+					EName = scanner.next(); //Employee name
+					System.out.print("Enter Product ID: ");
+					PID = scanner.nextInt(); //Product ID
+					CallableStatement Q6 = connection.prepareCall("{call Q6(?,?,?,?,?)}");
+					Q6.setInt(1, Ac);
+					Q6.setString(2, Date);
+					Q6.setInt(3, Days_Lost);
+					Q6.setString(4, EName);
+					Q6.setInt(5, PID);
+					Q6.executeUpdate();
+					System.out.print("Accident added to database");
+					break;
+				}
+				case 7: //Query 7
+				{
+					int PID = 0, Time_Spent = 0;
+					String Date;
+					System.out.print("Enter Product ID: ");
+					PID = scanner.nextInt(); //Product ID
+					CallableStatement Q7 = connection.prepareCall("{call Q7(?,?,?)}");
+					Q7.setInt(1, PID);
+					Q7.registerOutParameter(2, Types.VARCHAR);
+					Q7.registerOutParameter(3, Types.INTEGER);
+					Q7.executeUpdate();
+					Date = Q7.getString(2);
+					Time_Spent = Q7.getInt(3);
+					System.out.print("Date produced: " + Date + ";\nTime spent: " + Time_Spent + " days");
+					break;
+				}
+				case 8: //Query 8
+				{
+					int PID = 0;
+					String WName;
+					System.out.print("Enter Worker name: ");
+					WName = scanner.next(); //Worker name
+					CallableStatement Q8 = connection.prepareCall("{call Q8(?,?)}");
+					Q8.setString(1, WName);
+					Q8.registerOutParameter(2, Types.INTEGER);
+					Q8.executeUpdate();
+					PID = Q8.getInt(2);
+					System.out.print("Product IDs made by " + WName +": " + PID);
+					break;
+				}
+				case 9: //Query 9
+				{
+					int total = 0;
+					String QName;
+					System.out.print("Enter Quality Controller name: ");
+					QName = scanner.next();
+					CallableStatement Q9 = connection.prepareCall("{call Q9(?,?)}");
+					Q9.setString(1, QName);
+					Q9.registerOutParameter(2, Types.INTEGER);
+					Q9.executeUpdate();
+					total = Q9.getInt(2);
+					System.out.print("Total error by quality controller, " + QName +": " + total);
+					break;
+				}
+				case 10: //Query 10
+				{
+					float TCost = 0;
+					String QName;
+					System.out.print("Enter Quality Controller name: ");
+					QName = scanner.next();
+					CallableStatement Q10 = connection.prepareCall("{call Q10(?,?)}");
+					Q10.setString(1, QName);
+					Q10.registerOutParameter(2, Types.FLOAT);
+					Q10.executeUpdate();
+					TCost = Q10.getInt(2);
+					System.out.print("Total cost of products: " + TCost);
+					break;
+				}
+				case 11: //Query 11
+				{
+					String Color, CName;
+					System.out.print("Enter Color: ");
+					Color = scanner.next();
+					CallableStatement Q11 = connection.prepareCall("{call Q11(?,?)}");
+					Q11.setString(1, Color);
+					Q11.registerOutParameter(2, Types.VARCHAR);
+					Q11.executeUpdate();
+					CName = Q11.getString(2);
+					System.out.print("Customer List: " + CName);
+					break;
+				}
+				case 12: //Query 12
+				{
+					int Days_Lost = 0;
+					CallableStatement Q12 = connection.prepareCall("{call Q12(?)}");
+					Q12.registerOutParameter(1, Types.INTEGER);
+					Q12.executeUpdate();
+					Days_Lost = Q12.getInt(1);
+					System.out.print("Days lost to accidents in repairing product complaints: " + Days_Lost);
+					break;
+				}
+				case 13: //Query 13
+				{
+					String CName;
+					CallableStatement Q13 = connection.prepareCall("{call Q13(?)}");
+					Q13.registerOutParameter(1, Types.VARCHAR);
+					Q13.executeUpdate();
+					CName = Q13.getString(1);
+					System.out.print("Customers list who are also workers: " + CName);
+					break;
+				}
+				case 14: //Query 14
+				{
+					String CName;
+					CallableStatement Q14 = connection.prepareCall("{call Q14(?)}");
+					Q14.registerOutParameter(1, Types.VARCHAR);
+					Q14.executeUpdate();
+					CName = Q14.getString(1);
+					System.out.print("Customer list who have purchased products made, "
+							+ "certified or repaired by them: " + CName);
+					break;
+				}
+				case 15: //Query 15
+				{
+					String Year;
+					float ACost;
+					System.out.print("Enter year: ");;
+					Year = scanner.next(); //Year
+					CallableStatement Q15 = connection.prepareCall("{call Q15(?,?)}");
+					Q15.setString(1, Year);
+					Q15.registerOutParameter(2, Types.FLOAT);
+					Q15.executeUpdate();
+					ACost = Q15.getFloat(2);
+					System.out.print("Average product cost: " + ACost);
+					break;
+				}
+				case 16: //Query 16
+				{
+					String QName, TName;
+					System.out.print("Enter Technical Staff name: ");
+					TName = scanner.next(); //Technical staff name
+					System.out.print("Enter Quality Controller name: ");
+					QName = scanner.next(); //Quality Controller name
+					CallableStatement Q16 = connection.prepareCall("{call Q16(?,?)}");
+					Q16.setString(1, TName);
+					Q16.setString(2, QName);
+					Q16.executeUpdate();
+					System.out.print("Tech staff:" + TName +", and Qual Cont: " + QName + ", positions switched");
+				}
+				case 17: //Query 17
+				{
+					String Start, End;
+					System.out.print("Enter start date (YYYY-MM-DD): ");
+					Start = scanner.next(); //Start date
+					System.out.print("Enter end date (YYYY-MM-DD): ");
+					End = scanner.next(); //End date
+					CallableStatement Q17 = connection.prepareCall("{call Q17(?,?)}");
+					Q17.setString(1, Start);
+					Q17.setString(2, End);
+					Q17.executeUpdate();
+					System.out.print("Accidents deleted from database");
+					break;
+				}
+				case 18: //Query 18
+				{
+					String fileName;
+					String line = "";
+					String CName = null, Address = null, PID = null;
+					System.out.print("Enter input file name (file should be in the same directory): ");
+					fileName = scanner.next();
+					File file = new File(fileName);
+					try {
+						FileReader fileReader = new FileReader(file.getAbsoluteFile());
+						BufferedReader br = new BufferedReader(fileReader);
+						while((line = br.readLine()) != null){
+							String[] ip = line.split(",");
+							CName = ip[0];
+							Address = ip[1];
+							PID = ip[2];
+							CallableStatement Q18 = connection.prepareCall("{call Q3(?,?)}");
+							Q18.setString(1,  CName);
+							Q18.setString(2,  Address);
+							Q18.setString(3,  PID);
+							Q18.executeUpdate();							
+						}
+						br.close();
+						System.out.print("Data file " + fileName + " has been successfully added to database");
+					}
+					catch(Exception e) {
+						System.out.println("Error: " +e.getMessage());
+					}
+					break;
+				}
+				case 19: //Query 19
+				{
+					String fileName;
+					CallableStatement Q19 = connection.prepareCall("{call Q19(?,?)}");
+					Q19.registerOutParameter(1, Types.VARCHAR);
+					Q19.registerOutParameter(2, Types.VARCHAR);
+					Q19.executeUpdate();
+					System.out.print("Enter output file name: ");
+					fileName = scanner.next(); //File name
+					File file = new File(fileName);
+					try {
+						FileWriter fileWriter = new FileWriter(file.getAbsoluteFile());
+						BufferedWriter bw = new BufferedWriter(fileWriter);
+						bw.write("Customer Name\t\tAddress");
+						bw.newLine();
+						bw.write(Q19.getString(1) + "\t" + Q19.getString(2));
+						bw.newLine();
+						bw.close();
+						System.out.print("Data file " + fileName + " has been successfully created");
+					}
+					catch(Exception e) {
+						System.out.println("Error :" + e.getMessage());
+					}
+					break;
+				}
+				case 20: //Exit
+				{
+					System.out.println("Exited");
+					break;
+				}
+				default:
+				{
+					System.out.println("Enter valid input");
+				}
+				}
+			}
+			scanner.close(); //close scanner instance
+		} 
+		catch(SQLException e) { //catch connection exceptions
+			System.out.println( "Error: " + e.getMessage());
+		}
+	}
+}
