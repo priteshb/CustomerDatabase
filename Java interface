@@ -10,15 +10,6 @@ public class Project_Java_Bhoumick_Pritesh
 { 
 	public static void main(String[] args) throws SQLException 
 	{ 
-		// Connect to database 
-		final String hostName = "bhou2019-sql-server.database.windows.net"; 
-		final String dbName = "cs-dsa-4513-sql-db"; 
-		final String user = "bhou2019"; 
-		final String password = "Pupul*90"; 
-		final String url = String.format("jdbc:sqlserver://%s:1433;database=%s;user=%s;"
-				+ "password=%s;encrypt=true;hostNameInCertificate=*.database.windows.net;"
-				+ "loginTimeout=30;", hostName, dbName, user, password); 
-
 		try (final Connection connection = DriverManager.getConnection(url)) 
 		{ 
 			System.out.println("Connection established\n");
